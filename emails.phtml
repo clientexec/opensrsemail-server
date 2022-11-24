@@ -1,0 +1,153 @@
+<div class="container bg-white pt-3 pb-3">
+    <button type="button" class="btn btn-success mb-2" data-toggle="modal" data-target="#emailModal">
+        <?php echo $this->user->lang('Add Email'); ?>
+    </button>
+    <div class="data-table-wrapper">
+        <div class="table-responsive">
+            <table class="table" id="email-list">
+                <thead>
+                    <tr>
+                        <th><?php echo $this->user->lang('Account'); ?></th>
+                        <th><?php echo $this->user->lang('Status'); ?></th>
+                        <th><?php echo $this->user->lang('Workgroup'); ?></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($this->emails as $email) { ?>
+                    <tr>
+                        <td><?php echo $email->user; ?></td>
+                        <td><?php echo $email->status; ?></td>
+                        <td><?php echo $email->workgroup; ?></td>
+                        <td>
+                            <button data-email="<?php echo $email->user; ?>" id="login-btn" type="button" class="btn btn-success">
+                                Login
+                            </button>
+                            <button data-email="<?php echo $email->user; ?>" id="delete-btn" type="button" class="btn btn-danger">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="emailModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <?php echo $this->user->lang('Email Address'); ?>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input placeholder="<?php echo $this->user->lang('Email Address'); ?>" type="text" id="email" class="form-control" />
+                    <br>
+                    <input placeholder="<?php echo $this->user->lang('Password'); ?>" type="text" id="password" class="form-control" />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addEmailButton">
+                    <?php echo $this->user->lang('Submit'); ?>
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <?php echo $this->user->lang('Close');?>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var id = '<?php echo $this->userPackageId; ?>';
+
+    $(document).ready(function() {
+        var ticketTable = $('#email-list').DataTable({
+            'language': {
+                'sEmptyTable': clientexec.lang('No email accounts to show'),
+                'zeroRecords': clientexec.lang('No matching email accounts found')
+            }
+        });
+    });
+
+    $('#login-btn').on('click', function(e) {
+        clientexec.mask();
+        $.ajax({
+            type: 'POST',
+            url: 'index.php?fuse=admin&action=doaction&controller=snapins&plugin=opensrsemail&type=server',
+            data: {
+                do: 'getToken',
+                email: $(this).data('email'),
+                id: id
+            },
+            dataType: 'json',
+            complete: function(response) {
+                response = response.responseJSON;
+                clientexec.parseResponse(response);
+                clientexec.unMask();
+                if (response.success == true) {
+                    if (response.url != '') {
+                        window.open(response.url, '_blank');
+                    }
+                }
+            }
+        });
+    });
+
+    $('#delete-btn').on('click', function(e) {
+        clientexec.mask();
+        $.ajax({
+            type: 'POST',
+            url: 'index.php?fuse=admin&action=doaction&controller=snapins&plugin=opensrsemail&type=server',
+            data: {
+                do: 'deleteMailbox',
+                email: $(this).data('email'),
+                id: id
+            },
+            dataType: 'json',
+            complete: function(response) {
+                response = response.responseJSON;
+                clientexec.parseResponse(response);
+                if (response.success == true) {
+                    location.reload();
+                } else {
+                    clientexec.unMask();
+                }
+            }
+        });
+    });
+
+    $('#addEmailButton').on('click', function(){
+        email = $('#email').val();
+        password = $('#password').val();
+        if ($.trim(email) !== "" && $.trim(password) !== "") {
+            $.ajax({
+                type: 'POST',
+                url: 'index.php?fuse=admin&action=doaction&controller=snapins&plugin=opensrsemail&type=server',
+                data: {
+                    do: 'addMailbox',
+                    email: email,
+                    password: password,
+                    id: id
+                },
+                dataType: 'json',
+                complete: function(response) {
+                    $('#emailModal').modal('hide');
+                    response = response.responseJSON;
+                    clientexec.parseResponse(response);
+                    if (response.success == true) {
+                        location.reload();
+                    }
+                }
+            });
+        }
+    });
+</script>
