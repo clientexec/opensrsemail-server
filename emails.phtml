@@ -1,37 +1,35 @@
-<div class="container bg-white pt-3 pb-3">
-    <button type="button" class="btn btn-success mb-2" data-toggle="modal" data-target="#emailModal">
-        <?php echo $this->user->lang('Add Email'); ?>
-    </button>
-    <div class="data-table-wrapper">
-        <div class="table-responsive">
-            <table class="table" id="email-list">
-                <thead>
-                    <tr>
-                        <th><?php echo $this->user->lang('Account'); ?></th>
-                        <th><?php echo $this->user->lang('Status'); ?></th>
-                        <th><?php echo $this->user->lang('Workgroup'); ?></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($this->emails as $email) { ?>
-                    <tr>
-                        <td><?php echo $email->user; ?></td>
-                        <td><?php echo $email->status; ?></td>
-                        <td><?php echo $email->workgroup; ?></td>
-                        <td>
-                            <button data-email="<?php echo $email->user; ?>" id="login-btn" type="button" class="btn btn-success">
-                                Login
-                            </button>
-                            <button data-email="<?php echo $email->user; ?>" id="delete-btn" type="button" class="btn btn-danger">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
-        </div>
+<button type="button" class="btn btn-success mb-2" data-toggle="modal" data-target="#emailModal">
+    <?php echo $this->user->lang('Add Email'); ?>
+</button>
+<div class="data-table-wrapper">
+    <div class="table-responsive">
+        <table class="table" id="email-list">
+            <thead>
+                <tr>
+                    <th><?php echo $this->user->lang('Account'); ?></th>
+                    <th><?php echo $this->user->lang('Status'); ?></th>
+                    <th><?php echo $this->user->lang('Workgroup'); ?></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($this->emails as $email) { ?>
+                <tr>
+                    <td><?php echo $email->user; ?></td>
+                    <td><?php echo $email->status; ?></td>
+                    <td><?php echo $email->workgroup; ?></td>
+                    <td>
+                        <button data-email="<?php echo $email->user; ?>" id="login-btn" type="button" class="btn btn-success">
+                            <?php echo $this->user->lang('Login'); ?>
+                        </button>
+                        <button data-email="<?php echo $email->user; ?>" id="delete-btn" type="button" class="btn btn-danger">
+                            <?php echo $this->user->lang('Delete'); ?>
+                        </button>
+                    </td>
+                </tr>
+                <?php } ?>
+            </tbody>
+        </table>
     </div>
 </div>
 

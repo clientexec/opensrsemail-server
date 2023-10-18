@@ -15,6 +15,10 @@ class PluginOpensrsemail extends ServerPlugin
         ]
     );
 
+    public $icons = [
+        'emails' => 'fa fa-envelope',
+    ];
+
     private $api = null;
 
     public function getVariables()
@@ -201,20 +205,23 @@ class PluginOpensrsemail extends ServerPlugin
 
     public function emails($userPackage, $view)
     {
-        $view->addScriptPath(APPLICATION_PATH.'/../plugins/server/opensrsemail/');
+        $view->addScriptPath(APPLICATION_PATH . '/../plugins/server/opensrsemail/');
+        $view->userPackageId = $userPackage->id;
 
         $args = $this->buildParams($userPackage);
-        $this->setup($args);
 
-        $emails = $this->api->getDomainMailboxes(
-            $userPackage->getCustomField(
-                $args['server']['variables']['plugin_opensrsemail_Email_Domain_Custom_Field'],
-                CUSTOM_FIELDS_FOR_PACKAGE
-            )
-        );
-
-        $view->userPackageId = $userPackage->id;
-        $view->emails = $emails['response']['users'];
+        try {
+            $this->setup($args);
+            $emails = $this->api->getDomainMailboxes(
+                $userPackage->getCustomField(
+                    $args['server']['variables']['plugin_opensrsemail_Email_Domain_Custom_Field'],
+                    CUSTOM_FIELDS_FOR_PACKAGE
+                )
+            );
+            $view->emails = $emails['response']['users'];
+        } catch (Exception $e) {
+            $view->emails = [];
+        }
         return $view->render('emails.phtml');
     }
 
